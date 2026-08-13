@@ -1,5 +1,9 @@
+import { useSignIn } from "@clerk/expo";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StatusBar,
   Text,
@@ -84,17 +88,123 @@ const AppleIcon = () => (
 );
 
 export default function SignInScreen() {
-  const [showPwd, setShowPwd] = useState(false);
+  const { signIn, errors, fetchStatus } = useSignIn();
+
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
-  const [pwd, setPwd] = useState("");
+
+  const onSignInPress = async () => {
+    const { error } = await signIn.password({
+      emailAddress: email,
+      password,
+    });
+    if (error) {
+      return;
+    }
+
+    if (signIn.status === "complete") {
+      await signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            console.log(session?.currentTask);
+            return;
+          }
+          const url = decorateUrl("/");
+          router.replace(url as any);
+        },
+      });
+    } else if (signIn.status === "needs_second_factor") {
+      await signIn.mfa.sendPhoneCode();
+    } else if (signIn.status === "needs_client_trust") {
+      const emailCodeFactor = signIn.supportedSecondFactors.find(
+        (factor) => factor.strategy === "email_code",
+      );
+      if (emailCodeFactor) {
+        await signIn.mfa.sendEmailCode();
+      }
+    } else {
+      console.error("Sign-in attempt not complete:", signIn);
+    }
+  };
+
+  const onVerifyPress = async () => {
+    await signIn.mfa.verifyEmailCode({ code });
+
+    if (signIn.status === "complete") {
+      await signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
+          if (session?.currentTask) {
+            console.log(session?.currentTask);
+            return;
+          }
+          const url = decorateUrl("/");
+          router.replace(url as any);
+        },
+      });
+    } else {
+      console.error("Sign-in attempt not complete:", signIn);
+    }
+  };
+
+  const isLoading = fetchStatus === "fetching";
+
+  if (signIn.status === "needs_client_trust") {
+    return (
+      <View className="flex-1 justify-center items-center bg-white px-6">
+        <Text className="text-2xl font-bold text-gray-800 mb-2">
+          Verify your account
+        </Text>
+
+        <TextInput
+          className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4"
+          placeholder="Enter verification code"
+          placeholderTextColor="#9CA3AF"
+          keyboardType="number-pad"
+          value={code}
+          onChangeText={setCode}
+        />
+        {errors.fields.code && (
+          <Text className="text-red-500 mb-4">
+            {errors.fields.code.message}
+          </Text>
+        )}
+
+        <TouchableOpacity
+          onPress={onVerifyPress}
+          disabled={isLoading}
+          className="w-full bg-blue-600 py-4 rounded-xl items-center mb-4"
+        >
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white font-bold text-base">Verify</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => signIn.mfa.sendEmailCode()}
+          className="py-2 mb-2"
+        >
+          <Text className="text-blue-600">I need a new code</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => signIn.reset()} className="py-2">
+          <Text className="text-blue-600">Start over</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView className="flex-1 px-7" showsVerticalScrollIndicator={false}>
-        {/* Back */}
-        <TouchableOpacity className="mt-4 mb-7 self-start">
-          <BackIcon />
+        <TouchableOpacity onPress={() => router.back()} className="pt-2 pb-5">
+          <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
 
         {/* Header */}
@@ -117,6 +227,12 @@ export default function SignInScreen() {
           onChangeText={setEmail}
         />
 
+        {errors.fields.identifier && (
+          <Text className="text-red-500 mb-4">
+            {errors.fields.identifier.message}
+          </Text>
+        )}
+
         {/* Password */}
         <View className="flex-row justify-between items-center mb-1.5">
           <Text className="text-[13px] font-semibold text-[#333]">
@@ -131,26 +247,38 @@ export default function SignInScreen() {
             className="w-full pl-4 pr-12 py-3.5 border border-[#e8e8e8] rounded-xl text-[15px] text-[#111]"
             placeholder="••••••••"
             placeholderTextColor="#aaa"
-            secureTextEntry={!showPwd}
-            value={pwd}
-            onChangeText={setPwd}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity
             className="absolute right-4 top-3.5"
-            onPress={() => setShowPwd((v) => !v)}
+            onPress={() => setShowPassword((v) => !v)}
           >
-            <EyeIcon open={showPwd} />
+            <EyeIcon open={showPassword} />
           </TouchableOpacity>
+
+          {errors.fields.password && (
+            <Text className="text-red-500 mb-4">
+              {errors.fields.password.message}
+            </Text>
+          )}
         </View>
 
         {/* Sign In Button */}
         <TouchableOpacity
+          onPress={onSignInPress}
+          disabled={isLoading}
           className="w-full bg-[#0d0d0d] rounded-[14px] py-4 items-center mb-6"
           activeOpacity={0.85}
         >
-          <Text className="text-white text-[16px] font-semibold tracking-wide">
-            Sign In
-          </Text>
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white text-[16px] font-semibold tracking-wide">
+              Sign In
+            </Text>
+          )}
         </TouchableOpacity>
 
         {/* Divider */}
@@ -184,11 +312,11 @@ export default function SignInScreen() {
           <Text className="text-[14px] text-[#666]">
             Don't have an account?{" "}
           </Text>
-          <TouchableOpacity>
+          <Link href="/sign-up">
             <Text className="text-[14px] font-bold text-[#0d0d0d]">
               Sign up
             </Text>
-          </TouchableOpacity>
+          </Link>
         </View>
       </ScrollView>
     </SafeAreaView>

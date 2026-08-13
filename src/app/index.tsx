@@ -1,7 +1,9 @@
-import { useRouter } from "expo-router";
+import { useAuth } from "@clerk/expo";
+import { Redirect, useRouter } from "expo-router";
+import { useState } from "react";
 import {
+  ActivityIndicator,
   Image,
-  Pressable,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -12,6 +14,15 @@ import "../../global.css";
 
 export default function App() {
   const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState();
+
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) return null;
+
+  // Redirect based on auth state
+  if (isSignedIn) return <Redirect href="/(root)/(tabs)" />;
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50 ">
@@ -35,14 +46,18 @@ export default function App() {
       </View>
 
       <View className="items-center px-[26px]">
-        <Pressable
+        <TouchableOpacity
           onPress={() => router.push("/(auth)/sign-up")}
           className="mt-[17px] h-[48px] w-full flex-row items-center justify-center rounded-full bg-black active:opacity-90 mb-2"
         >
-          <Text className="text-[16px] font-bold tracking-[-0.4px] text-white">
-            Get Started
-          </Text>
-        </Pressable>
+          {isLoading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-[16px] font-bold tracking-[-0.4px] text-white">
+              Get Started
+            </Text>
+          )}
+        </TouchableOpacity>
         <View className="flex-row justify-center items-center">
           <Text className="text-sm text-slate-500">
             Already have an account?{" "}
