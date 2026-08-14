@@ -5,9 +5,10 @@ import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { Tabs } from "expo-router";
+import { useUserStore } from "../../../../store/userStore";
 
 export default function TabsLayout() {
-  // const isAdmin = useUserStore((state) => state.isAdmin);
+  const isAdmin = useUserStore((state) => state.isAdmin);
   return (
     <Tabs
       screenOptions={{
@@ -36,6 +37,7 @@ export default function TabsLayout() {
         name="create"
         options={{
           title: "List property",
+          href: isAdmin ? undefined : null,
           tabBarIcon: ({ color, size }) => (
             <Feather name="plus-circle" size={24} color="black" />
           ),
