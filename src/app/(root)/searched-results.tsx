@@ -6,6 +6,8 @@ import {
   Alert,
   FlatList,
   Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   RefreshControl,
   ScrollView,
   Text,
@@ -16,8 +18,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../../lib/supabase";
 import { Property } from "../../../types";
-
-// const { width } = Dimensions.get("window");
 
 export default function SearchedResultsScreen({
   property,
@@ -41,9 +41,17 @@ export default function SearchedResultsScreen({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [cardWidth, setCardWidth] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const { width } = useWindowDimensions();
   const CARD_WIDTH = width - 40;
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (cardWidth <= 0) return;
+    const scrollPosition = event.nativeEvent.contentOffset.x;
+    const index = Math.round(scrollPosition / cardWidth);
+    setActiveIndex(index);
+  };
 
   const fetchResults = async () => {
     setLoading(true);
@@ -94,34 +102,53 @@ export default function SearchedResultsScreen({
     const hasImages = item.images && item.images.length > 0;
 
     return (
-      <View className="mb-6 ">
-        {/* Image Carousel Container */}
-        <View className="relative w-full h-80 rounded-3xl overflow-hidden bg-gray-200 mb-3">
-          {hasImages ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              nestedScrollEnabled={true}
-              snapToInterval={CARD_WIDTH}
-              snapToAlignment="start"
-              decelerationRate="fast"
-              disableIntervalMomentum={true}
-              scrollEventThrottle={16}
-              style={{ width: CARD_WIDTH, height: "100%" }}
-            >
-              {item.images.map((imgUrl, index) => (
-                <Image
-                  key={index}
-                  source={{ uri: imgUrl }}
-                  style={{ width: CARD_WIDTH, height: "100%" }}
-                  // style={{ width, height: 350 }}
-                  // className="h-full"
-                  resizeMode="cover"
-                />
-              ))}
-            </ScrollView>
+      <View className="mb-6 bg-gray-50">
+        <View
+          className="relative w-full h-80 rounded-3xl overflow-hidden bg-gray-200 mb-3"
+          onLayout={(e) => setCardWidth(e.nativeEvent.layout.width)}
+        >
+          {hasImages && cardWidth > 0 ? (
+            <>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                nestedScrollEnabled={true}
+                snapToInterval={CARD_WIDTH}
+                snapToAlignment="start"
+                decelerationRate="fast"
+                disableIntervalMomentum={true}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+                style={{ width: CARD_WIDTH, height: "100%" }}
+              >
+                {item.images.map((imgUrl, index) => (
+                  <Image
+                    key={index}
+                    source={{ uri: imgUrl }}
+                    style={{ width: CARD_WIDTH, height: "100%" }}
+                    resizeMode="cover"
+                  />
+                ))}
+              </ScrollView>
+
+              {item.images.length > 1 && (
+                <View className="absolute bottom-3 left-0 right-0 items-center z-10 pointer-events-none">
+                  <View className="flex-row items-center gap-1.5  px-3 py-1.5 rounded-full">
+                    {item.images.map((_, index) => (
+                      <View
+                        key={index}
+                        className={`rounded-full ${
+                          activeIndex === index
+                            ? "w-4 h-1.5 bg-white"
+                            : "w-1.5 h-1.5 bg-white/60"
+                        }`}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+            </>
           ) : (
-            /* Placeholder View when item has no images */
             <View className="w-full h-full items-center justify-center bg-gray-100">
               <Ionicons name="image-outline" size={36} color="#9CA3AF" />
               <Text className="text-xs text-gray-400 mt-1 font-medium">
@@ -169,6 +196,8 @@ export default function SearchedResultsScreen({
     );
   };
 
+  const headingLabel = query || city || category || "All Properties";
+
   if (loading)
     return (
       <View className="flex-1 items-center justify-center">
@@ -177,13 +206,24 @@ export default function SearchedResultsScreen({
     );
   return (
     <SafeAreaView className="flex-1 bg-gray-50  py-3">
-      <View>
+      <View className="flex-row items-center px-5 pt-2 pb-4 border-b border-[#e8e8e8]">
         <TouchableOpacity
           onPress={() => router.push("/(root)/(tabs)/search")}
-          className="pt-1 pb-1 px-5"
+          className="mr-3 w-8 h-8 items-center justify-center"
         >
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons name="arrow-back" size={22} color="#0d0d0d" />
         </TouchableOpacity>
+        <View className="flex-1">
+          <Text
+            numberOfLines={1}
+            className="text-[15px] font-bold text-[#0d0d0d]"
+          >
+            {headingLabel}
+          </Text>
+          <Text className="text-xs text-[#999]">
+            {results.length} result{results.length !== 1 ? "s" : ""} found
+          </Text>
+        </View>
       </View>
 
       <FlatList
@@ -217,7 +257,6 @@ export default function SearchedResultsScreen({
             </Text>
           </View>
         }
-        // renderItem={({ item }) =>}
       />
     </SafeAreaView>
   );
