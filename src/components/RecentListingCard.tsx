@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useSavedProperty } from "../../hooks/useSavedProperty";
 import { Property } from "../../types";
@@ -12,16 +13,18 @@ export default function RecentListingCard({
   onUnsave?: () => void;
   showSave?: boolean;
 }) {
+  const router = useRouter();
   const { isSaved, saveLoading, toggleSave } = useSavedProperty(
     property.id,
     onUnsave,
   );
   return (
     <TouchableOpacity
-      className="flex-row items-center gap-3 mx-5 rounded-2xl overflow-hidden border border-[#f0f0f0] bg-white"
-      style={{ elevation: 1 }}
+      onPress={() => router.push(`/(root)/property/${property.id}`)}
+
+      className="flex-row items-center gap-3 mx-5 mb-3 rounded-2xl overflow-hidden border border-[#f0f0f0] bg-white"
+      // style={{ elevation: 1 }}
     >
-      {/* Thumbnail */}
       <View className="w-[140px] h-[120px] rounded-xl overflow-hidden bg-[#e8e8e8]">
         <Image
           source={{ uri: property.images[0] }}

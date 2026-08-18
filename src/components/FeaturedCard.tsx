@@ -21,6 +21,7 @@ export default function FeaturedCard({
 
   return (
     <TouchableOpacity
+      onPress={() => router.push(`/(root)/property/${property.id}`)}
       className="w-[220px] rounded-2xl overflow-hidden border border-[#f0f0f0] bg-white"
       style={{ elevation: 1 }}
     >

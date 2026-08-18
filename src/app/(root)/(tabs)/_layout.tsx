@@ -2,6 +2,7 @@
 // import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { Tabs } from "expo-router";
@@ -13,6 +14,8 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarActiveTintColor: "#111827",
+        tabBarInactiveTintColor: "#9CA3AF",
       }}
     >
       <Tabs.Screen
@@ -20,7 +23,7 @@ export default function TabsLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <Octicons name="home-fill" size={24} color="black" />
+            <Octicons name="home-fill" size={size} color="black" />
           ),
         }}
       />
@@ -29,7 +32,7 @@ export default function TabsLayout() {
         options={{
           title: "Search",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="search" size={24} color="black" />
+            <Feather name="search" size={size} color="black" />
           ),
         }}
       />
@@ -39,7 +42,7 @@ export default function TabsLayout() {
           title: "List property",
           href: isAdmin ? undefined : null,
           tabBarIcon: ({ color, size }) => (
-            <Feather name="plus-circle" size={24} color="black" />
+            <FontAwesome6 name="circle-plus" size={size} color="black" />
           ),
         }}
       />
@@ -48,7 +51,7 @@ export default function TabsLayout() {
         options={{
           title: "Saved",
           tabBarIcon: ({ color, size }) => (
-            <AntDesign name="heart" size={24} color="black" />
+            <AntDesign name="heart" size={size} color="black" />
           ),
         }}
       />
@@ -57,7 +60,7 @@ export default function TabsLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={24} color="black" />
+            <Ionicons name="person-outline" size={size} color="black" />
           ),
         }}
       />
