@@ -97,6 +97,12 @@ export default function PropertyDetailsScreen() {
   }
   const images = property.images?.length ? property.images : [];
 
+  const isLongDesc = (property.description?.length ?? 0) > 150;
+  const displayDesc =
+    expanded || !isLongDesc
+      ? property.description
+      : property.description?.slice(0, 290) + "...";
+
   const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${
     property.longitude - 0.003
   }%2C${property.latitude - 0.003}%2C${property.longitude + 0.003}%2C${
@@ -182,9 +188,40 @@ export default function PropertyDetailsScreen() {
           <Text className="text-lg font-bold text-[#0d0d0d]  tracking-tight">
             Description
           </Text>
-          <Text className="text-sm font-normal text-gray-600 leading-6 mb-2">
-            {property.description}
+          <Text className="text-[#444] text-sm leading-6 mb-5">
+            {expanded ? displayDesc : displayDesc.slice(0, 287)}
+            {isLongDesc && (
+              <Text
+                className="text-blue-600 text-sm font-medium"
+                onPress={() => setExpanded(!expanded)}
+              >
+                {expanded ? " Show less" : "... Read more"}
+              </Text>
+            )}
           </Text>
+          {/* <Text className="text-sm font-normal text-gray-600 leading-6 mb-2">
+            {displayDesc}
+          </Text>
+
+          {isLongDesc && (
+            <TouchableOpacity
+              onPress={() => setExpanded(!expanded)}
+              className="flex-row items-center self-start mb-5 "
+              style={{ gap: 4 }}
+            >
+              <Text className="text-[#0d0d0d] text-sm font-medium">
+                {expanded ? "Show less" : "Read more"}
+              </Text>
+              <Ionicons
+                name={expanded ? "chevron-up" : "chevron-down"}
+                size={12}
+                color="#0d0d0d"
+              />
+            </TouchableOpacity>
+          )} */}
+
+          <View className="mb-5" />
+
           <Text className="text-2xl font-extrabold text-[#0d0d0d]">
             ₦{property.price.toLocaleString()}
           </Text>
