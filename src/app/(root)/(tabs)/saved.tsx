@@ -54,7 +54,7 @@ export default function SavedScreen() {
         <Text className="text-2xl font-bold text-gray-900">Saved</Text>
         {!loading && (
           <Text className="text-sm text-gray-400 mt-1">
-            {saved.length} {saved.length === 1 ? "property" : "properties"}{" "}
+            {saved.length}
             saved
           </Text>
         )}

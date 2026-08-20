@@ -86,6 +86,8 @@ export default function CreateScreen() {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [detectingLocation, setDetectingLocation] = useState(false);
 
+  const [imagesCount, setImagesCount] = useState([]); // Array holding uploaded photo URIs
+
   const [category, setCategory] = useState("");
 
   const updateForm = (fields: Partial<FormState>) =>
@@ -314,8 +316,8 @@ export default function CreateScreen() {
                 Photos{" "}
               </Text>
               <Text className="text-xs text-gray-400 items-end">
-                {/* {photos.length}/10 */}
-                0/10
+                {/* FIX */}
+                {imagesCount.length}/6
               </Text>
             </View>
 

@@ -1,4 +1,5 @@
 import { useAuth, useUser } from "@clerk/expo";
+import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -6,6 +7,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Linking,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -68,14 +70,15 @@ export default function ProfileScreen() {
       </SafeAreaView>
     );
   }
+
+  const soon = () => Alert.alert("Coming soon");
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50 px-5 ">
       <View className="flex-row items-center justify-between pt-3 pb-4">
         <Text className="text-[18px] font-bold text-[#0d0d0d]">Profile</Text>
         <TouchableOpacity
-          onPress={() =>
-            Alert.alert("Coming Soon", "Notifications coming soon!")
-          }
+          onPress={soon}
           className="w-9 h-9 items-center justify-center"
         >
           <Ionicons name="settings-outline" size={24} color="black" />
@@ -83,8 +86,8 @@ export default function ProfileScreen() {
       </View>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className=" px-5 border border-gray-200 rounded-2xl">
-          <View className="flex-row items-center gap-5 py-8">
+        <View className="">
+          <View className="flex-row gap-5 py-4">
             <View className="relative">
               <Image
                 source={{ uri: user.imageUrl }}
@@ -119,8 +122,8 @@ export default function ProfileScreen() {
                   <VerifiedIcon />
                 </View>
               ) : (
-                <View className="mt-2 px-2 py-0.5 bg-blue-50 rounded-full">
-                  <Text className="text-[12px] text-blue-600 font-semibold text-center">
+                <View className="flex-row gap-1 mt-2 px-3 py-2 bg-[#f0f0f0] rounded-full self-start">
+                  <Text className="text-[11px] text-[#333] font-semibold text-center">
                     Buyer
                   </Text>
                 </View>
@@ -129,56 +132,99 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View className="gap-2 mt-10 border border-gray-200 rounded-xl p-2">
-          <MenuItem
-            icon="heart"
-            label="Saved Listings"
+        {/* Menu Items written one by one */}
+        <View className="mt-2 mb-2">
+          {/* My Listings */}
+          <TouchableOpacity
+            onPress={soon}
+            className="flex-row items-center justify-between px-3 py-4 bg-white rounded-2xl mb-2"
+          >
+            <View className="flex-row items-center">
+              <Feather name="grid" size={20} color="#4B5563" />
+              <Text className="ml-4 text-base font-medium text-gray-800">
+                My Listings
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          {/* Help Center */}
+          <TouchableOpacity
             onPress={() =>
-              Alert.alert("Coming Soon", "Notifications coming soon!")
+              Linking.openURL(
+                "mailto:caniceaba404@gmail.com?subject=Help%20%26%20Support%20-%20Kribb%20App",
+              )
             }
-          />
-          <MenuItem
-            icon="notifications-outline"
-            label="Notifications"
+            className="flex-row items-center justify-between px-3 py-4 bg-white rounded-2xl mb-2"
+          >
+            <View className="flex-row items-center">
+              <Ionicons name="help-circle" size={20} color="#4B5563" />
+              <Text className="ml-4 text-base font-medium text-gray-800">
+                Help Center
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          {/* Feedback */}
+          <TouchableOpacity
             onPress={() =>
-              Alert.alert("Coming Soon", "Notifications coming soon!")
+              Linking.openURL(
+                "mailto:caniceaba404@gmail.com?subject=Help%20%26%20Support%20-%20Kribb%20App",
+              )
             }
-          />
-          <MenuItem
-            icon="notifications-outline"
-            label="Notifications"
-            onPress={() =>
-              Alert.alert("Coming Soon", "Notifications coming soon!")
-            }
-          />
-          <MenuItem
-            icon="notifications-outline"
-            label="Notifications"
-            onPress={() =>
-              Alert.alert("Coming Soon", "Notifications coming soon!")
-            }
-          />
-          <MenuItem
-            icon="notifications-outline"
-            label="Notifications"
-            onPress={() =>
-              Alert.alert("Coming Soon", "Notifications coming soon!")
-            }
-          />
+            className="flex-row items-center justify-between px-3 py-4 bg-white rounded-2xl mb-2"
+          >
+            <View className="flex-row items-center">
+              <Feather name="message-square" size={20} color="#4B5563" />
+              <Text className="ml-4 text-base font-medium text-gray-800">
+                Feedback
+              </Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          {/* Privacy Policy */}
+          <TouchableOpacity
+            onPress={soon}
+            className="flex-row items-center justify-between px-3 py-4 bg-white rounded-2xl mb-2"
+          >
+            <View className="flex-row items-center">
+              <Feather name="shield" size={20} color="#4B5563" />
+              <Text className="ml-4 text-base font-medium text-gray-800">
+                Privacy Policy
+              </Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          {/* Terms of Use */}
+          <TouchableOpacity
+            onPress={soon}
+            className="flex-row items-center justify-between px-3 py-4 bg-white rounded-2xl mb-2"
+          >
+            <View className="flex-row items-center">
+              <Feather name="file-text" size={20} color="#4B5563" />
+              <Text className="ml-4 text-base font-medium text-gray-800">
+                Terms of Use
+              </Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
         </View>
-        <View className="gap-2 mt-10 border border-gray-200 rounded-xl  px-4 py-1">
+        <View className="mt-2 mb-2">
           <TouchableOpacity
             onPress={handleSignOut}
-            className="flex-row items-center gap-3 py-4 border-b border-gray-200"
+            className="flex-row gap-3 items-center px-3 py-4 bg-white rounded-2xl mb-2"
           >
             <Ionicons name="log-out-outline" size={20} color="#EF4444" />
             <Text className="text-[14px] font-semibold text-red-500">
-              LogOut
+              Sign Out
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            // onPress={handleSignOut}
-            className="flex-row items-center gap-3 py-4"
+            onPress={soon}
+            className="flex-row gap-3 items-center px-3 py-4 bg-white rounded-2xl mb-2"
           >
             <Ionicons name="trash-outline" size={20} color="#EF4444" />
             <Text className="text-[14px] font-semibold text-red-500">
@@ -188,28 +234,5 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function MenuItem({
-  icon,
-  label,
-  onPress,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  onPress?: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      className="flex-row items-center gap-4 bg-gray-50 px-4 py-4 rounded-2xl border-b border-gray-200"
-    >
-      <Ionicons name={icon} size={22} color="#6B7280" />
-      <Text className="flex-1 text-gray-700 font-medium text-base">
-        {label}
-      </Text>
-      <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
-    </TouchableOpacity>
   );
 }
